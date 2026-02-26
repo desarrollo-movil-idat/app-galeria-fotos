@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.view.View
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -62,7 +63,19 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         abrirCamara.launch(intentCamara)
     }
     private fun compartirFoto (){
-
+        val file = archivoFoto
+        if(file == null || rutaArchivoActual.isBlank()){
+            Toast.makeText(this, "Debe tomar foto antes de compartir", Toast.LENGTH_LONG).show()
+            return
+        }
+        val uri = FileProvider.getUriForFile(this,
+            FILE_PROVIDER_AUTHORITY, file)
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = MIME_JPG
+            putExtra(Intent.EXTRA_STREAM, uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        startActivity(Intent.createChooser(shareIntent, "Compartir Foto"))
     }
 
     private fun crearArchivoParaFoto() : File {
